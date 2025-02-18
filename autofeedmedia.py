@@ -229,7 +229,7 @@ def post_reel():
 
     if media_id:
         print("⏳ Waiting for Instagram to process the video...")
-        time.sleep(40)
+        time.sleep(120)
 
         publish_url = f"https://graph.facebook.com/v18.0/{INSTAGRAM_ACCOUNT_ID}/media_publish"
         publish_payload = {
