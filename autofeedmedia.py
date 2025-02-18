@@ -18,9 +18,9 @@ import base64
 # 🔹 Instagram Credentials
 ACCESS_TOKEN = "EAAWYAavlRa4BO8OE7Ho6gtx4a85DRgNMc59ZCpAdsHXNJnbZABREkXovZCKnbo9AlupOjbJ5xYSTBrMIMTVtu9n530I3ZC2JZBuZBpCDzHyjI7ngh8EtCrSvUho9VGZB9Xdxt5JLGNrHwfDsSIqtvxFjefG2t2JsgJpqfZAMCjO8AURp79mU0WAaLA7R"
 INSTAGRAM_ACCOUNT_ID = "17841468918737662"
-INSTAGRAM_NICHE_ACCOUNT = "aajtak"
+INSTAGRAM_NICHE_ACCOUNT = "factbrainy"
 
-def post_reel(): 
+def post_reel():
     """Uploads and posts an Instagram Reel automatically."""
     print(f"📅 Running at: {datetime.datetime.now()}")
 
@@ -41,15 +41,49 @@ def post_reel():
         if 'items' in data and len(data['items']) > 0:
             # Access the caption text from the first item in the 'items' list
             caption_text = data['items'][0]['caption']['text']
+
+            # Check if 'music_metadata' and 'music_canonical_id' exist
+            if 'music_metadata' in data['items'][0] and 'music_canonical_id' in data['items'][0]['music_metadata']:
+                music_canonical_id = data['items'][0]['music_metadata']['music_canonical_id']
+            else:
+                # Use the default ID if 'music_canonical_id' is missing or invalid
+                music_canonical_id = "18149596924049565"
+
+                print("Music Canonical ID:", music_canonical_id)
         else:
             # Handle the case where the expected structure is not found
             print("Error: Unexpected response structure or empty 'items' list.")
             print(data)  # Print the response for debugging
             return
+        url = "https://instagram-scraper-api2.p.rapidapi.com/v1/audio_info"
+
+        querystring = {"audio_canonical_id":music_canonical_id}
+
+        headers = {
+         	"x-rapidapi-key": "c4149d7f42msh169b1ac1d7c079ep17cebfjsn882b5a92dacd",
+	        "x-rapidapi-host": "instagram-scraper-api2.p.rapidapi.com"
+        }
+
+        response = requests.get(url, headers=headers, params=querystring)
+        response.raise_for_status()  # Raise an error for bad status codes
+        data = response.json()
+
+        print(response.json())
+        music_url = data['data']['download_url']
+        print(music_url)
+        cloudinary.config(
+                cloud_name="dkr5qwdjd",
+                api_key="797349366477678",
+                api_secret="9HUrfG_i566NzrCZUVxKyCHTG9U"
+            )
+        upload_result = cloudinary.uploader.upload(music_url, resource_type="video")
+
+    # 🔹 Print Public ID
+        music_public_id = upload_result.get("public_id")
+        print(f"✅ Uploaded Successfully! Public ID: {music_public_id}")
 
     except requests.exceptions.RequestException as e:
         print(f"❌ Failed to fetch Instagram caption: {e}")
-        return
 
     # 🔹 2. Generate Headline & Image Prompt
     url = "https://chatgpt-42.p.rapidapi.com/gpt4"
@@ -75,7 +109,7 @@ def post_reel():
     }
 
     headers = {
-        "x-rapidapi-key": "c4149d7f42msh169b1ac1d7c079ep17cebfjsn882b5a92dacd",
+        "x-rapidapi-key": "c66b66fd5fmsh2d1f2d4c5d0a073p17161ajsnb75f8dbbac1d",
         "x-rapidapi-host": "chatgpt-42.p.rapidapi.com",
         "Content-Type": "application/json"
     }
@@ -148,29 +182,31 @@ def post_reel():
         else:
             print("❌ Error: 'image' key not found in the response or response list is empty.")
             return
-            
-        
+
+
 
     except requests.exceptions.RequestException as e:
         print(f"❌ Failed to search for images: {e}")
         return
-    video_url = cloudinary.CloudinaryVideo("bgvideo").video(transformation=[
-            {'overlay': "black_bg_9_16"},
-            {'flags': "layer_apply",'width': 2200, 'crop': "fit"},
-            {'overlay': public_id},
-            {'flags': "layer_apply",'width': 1920, 'crop': "fit"},
-            {'overlay': "audio:reelaudio"},
-            {'flags': "layer_apply"},
-            {'width': 500, 'crop': "scale"},
-            {'overlay': {'font_family': "arial", 'font_size': 18, 'font_weight': "bold", 'text': "Style", 'text': summary},'color': "white",'background':"black", 'width': 400, 'crop': "fit"},
-            {'flags': "layer_apply", 'gravity': "north", 'y': 500},
-            {'overlay': {'font_family': "arial", 'font_size': 20, 'font_weight': "bold", 'text': "Style", 'text': "    autoFeed_tech"},'color': "black",'background':"skyblue", 'radius': 20, 'x': 20,'y': 20, 'width': 400, 'crop': "fit"},  # Added color: "white"
-            {'flags': "layer_apply", 'gravity': "north", 'y': 110},
-            {'overlay': {'font_family': "arial", 'font_size': 12, 'font_weight': "bold", 'text': "Style", 'text': "This page is totally handled by ai,which provides trending tech news faster than human!- Follow for fastest updates"},'color': "white",'width': 380, 'crop': "fit"},  # Added color: "white"
-            {'flags': "layer_apply", 'gravity': "north", 'y': 160},
-            {'overlay': {'font_family': "arial", 'font_size': 12, 'font_weight': "bold", 'text': "Style", 'text': "full details in caption"},'color': "white",'width': 300, 'crop': "fit"},  # Added color: "white"
-            {'flags': "layer_apply", 'gravity': "south", 'y': 150}
+    music_id = music_public_id  # Removed the trailing comma
 
+    video_url = cloudinary.CloudinaryVideo("bgvideo").video(transformation=[
+        {'overlay': "black_bg_9_16"},
+        {'flags': "layer_apply", 'width': 2200, 'crop': "fit"},
+        {'overlay': public_id},  
+        {'flags': "layer_apply", 'width': 1920, 'crop': "fit"},
+        {"overlay": f"audio:{music_id}", "start_offset": "40", "duration": "15"},
+        {'flags': "layer_apply"},
+        {'width': 500, 'crop': "scale"},
+        # Corrected text overlay parameters
+        {'overlay': {'font_family': "arial", 'font_size': 18, 'font_weight': "bold", 'text': summary}, 'color': "white", 'background': "black", 'width': 400, 'crop': "fit"},
+        {'flags': "layer_apply", 'gravity': "north", 'y': 500},
+        {'overlay': {'font_family': "arial", 'font_size': 20, 'font_weight': "bold", 'text': "autoFeed_tech"}, 'color': "black", 'background': "skyblue", 'radius': 20, 'x': 20, 'y': 20, 'width': 400, 'crop': "fit"},
+        {'flags': "layer_apply", 'gravity': "north", 'y': 110},
+        {'overlay': {'font_family': "arial", 'font_size': 12, 'font_weight': "bold", 'text': "This page is totally handled by ai, which provides trending tech news faster than human!"}, 'color': "white", 'width': 300, 'crop': "fit"},
+        {'flags': "layer_apply", 'gravity': "north", 'y': 160},
+        {'overlay': {'font_family': "arial", 'font_size': 12, 'font_weight': "bold", 'text': "full details in caption"}, 'color': "white", 'width': 300, 'crop': "fit"},
+        {'flags': "layer_apply", 'gravity': "south", 'y': 150}
     ])
 
     match = re.search(r'/webm"><source src="(.*\.mp4)"', str(video_url))
@@ -205,8 +241,6 @@ def post_reel():
     else:
         print("❌ Error: Failed to upload the video.")
 post_reel()
-
-
 
 
 
