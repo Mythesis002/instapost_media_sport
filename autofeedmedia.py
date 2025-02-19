@@ -28,7 +28,7 @@ def post_reel():
     url = "https://instagram230.p.rapidapi.com/user/posts"
     querystring = {"username": INSTAGRAM_NICHE_ACCOUNT}
     headers = {
-        "x-rapidapi-key": "628e474f5amsh0457d8f1b4fb50cp16b75cjsn70408f276e9b",
+        "x-rapidapi-key": "c66b66fd5fmsh2d1f2d4c5d0a073p17161ajsnb75f8dbbac1d",
         "x-rapidapi-host": "instagram230.p.rapidapi.com",
         "Content-Type": "application/json"
     }
@@ -37,13 +37,13 @@ def post_reel():
         response = requests.get(url, headers=headers, params=querystring)
         response.raise_for_status()  # Raise an error for bad status codes
         data = response.json()
-
-        if 'items' in data and len(data['items']) > 0:
+        # Check if 'items' is in data and it's not empty before accessing its elements
+        if 'items' in data and data['items'] and isinstance(data['items'], list) and len(data['items']) > 0:
             # Access the caption text from the first item in the 'items' list
             caption_text = data['items'][0]['caption']['text']
 
             # Check if 'music_metadata' and 'music_canonical_id' exist
-            if 'music_metadata' in data['items'][0] and 'music_canonical_id' in data['items'][0]['music_metadata']:
+            if 'music_metadata' in data['items'][0] and data['items'][0]['music_metadata'] and 'music_canonical_id' in data['items'][0]['music_metadata']:
                 music_canonical_id = data['items'][0]['music_metadata']['music_canonical_id']
             else:
                 # Use the default ID if 'music_canonical_id' is missing or invalid
@@ -193,7 +193,7 @@ def post_reel():
     video_url = cloudinary.CloudinaryVideo("bgvideo").video(transformation=[
         {'overlay': "black_bg_9_16"},
         {'flags': "layer_apply", 'width': 2200, 'crop': "fit"},
-        {'overlay': public_id},  
+        {'overlay': public_id},
         {'flags': "layer_apply", 'width': 1920, 'crop': "fit"},
         {"overlay": f"audio:{music_id}", "start_offset": "40", "duration": "15"},
         {'flags': "layer_apply"},
@@ -229,7 +229,7 @@ def post_reel():
 
     if media_id:
         print("⏳ Waiting for Instagram to process the video...")
-        time.sleep(120)
+        time.sleep(140)
 
         publish_url = f"https://graph.facebook.com/v18.0/{INSTAGRAM_ACCOUNT_ID}/media_publish"
         publish_payload = {
