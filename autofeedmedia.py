@@ -40,7 +40,7 @@ def post_reel():
         # Check if 'items' is in data and it's not empty before accessing its elements
         if 'items' in data and data['items'] and isinstance(data['items'], list) and len(data['items']) > 0:
             # Access the caption text from the first item in the 'items' list
-            caption_text = data['items'][0]['caption']['text']
+            caption_text = data['items'][3]['caption']['text']
 
             # Check if 'music_metadata' and 'music_canonical_id' exist
             if 'music_metadata' in data['items'][0] and data['items'][0]['music_metadata'] and 'music_canonical_id' in data['items'][0]['music_metadata']:
