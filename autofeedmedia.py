@@ -18,7 +18,7 @@ import base64
 # 🔹 Instagram Credentials
 ACCESS_TOKEN = "EAAWYAavlRa4BO8OE7Ho6gtx4a85DRgNMc59ZCpAdsHXNJnbZABREkXovZCKnbo9AlupOjbJ5xYSTBrMIMTVtu9n530I3ZC2JZBuZBpCDzHyjI7ngh8EtCrSvUho9VGZB9Xdxt5JLGNrHwfDsSIqtvxFjefG2t2JsgJpqfZAMCjO8AURp79mU0WAaLA7R"
 INSTAGRAM_ACCOUNT_ID = "17841468918737662"
-INSTAGRAM_NICHE_ACCOUNT = "factbrainy"
+INSTAGRAM_NICHE_ACCOUNT = "thetrendingindian"
 
 def post_reel():
     """Uploads and posts an Instagram Reel automatically."""
@@ -40,11 +40,11 @@ def post_reel():
         # Check if 'items' is in data and it's not empty before accessing its elements
         if 'items' in data and data['items'] and isinstance(data['items'], list) and len(data['items']) > 0:
             # Access the caption text from the first item in the 'items' list
-            caption_text = data['items'][3]['caption']['text']
+            caption_text = data['items'][0]['caption']['text']
 
             # Check if 'music_metadata' and 'music_canonical_id' exist
-            if 'music_metadata' in data['items'][3] and data['items'][3]['music_metadata'] and 'music_canonical_id' in data['items'][3]['music_metadata']:
-                music_canonical_id = data['items'][3]['music_metadata']['music_canonical_id']
+            if 'music_metadata' in data['items'][0] and data['items'][0]['music_metadata'] and 'music_canonical_id' in data['items'][0]['music_metadata']:
+                music_canonical_id = data['items'][0]['music_metadata']['music_canonical_id']
             else:
                 # Use the default ID if 'music_canonical_id' is missing or invalid
                 music_canonical_id = "18149596924049565"
