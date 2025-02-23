@@ -43,8 +43,8 @@ def post_reel():
             caption_text = data['items'][3]['caption']['text']
 
             # Check if 'music_metadata' and 'music_canonical_id' exist
-            if 'music_metadata' in data['items'][0] and data['items'][0]['music_metadata'] and 'music_canonical_id' in data['items'][0]['music_metadata']:
-                music_canonical_id = data['items'][0]['music_metadata']['music_canonical_id']
+            if 'music_metadata' in data['items'][3] and data['items'][3]['music_metadata'] and 'music_canonical_id' in data['items'][3]['music_metadata']:
+                music_canonical_id = data['items'][3]['music_metadata']['music_canonical_id']
             else:
                 # Use the default ID if 'music_canonical_id' is missing or invalid
                 music_canonical_id = "18149596924049565"
