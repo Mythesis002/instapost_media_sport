@@ -200,7 +200,7 @@ def post_reel():
       'background': "auto:predominant_gradient:2:diagonal_desc"
       },
       {'effect': 'gen_restore'},
-      {'effect': "fade:2000"} 	    
+      {'effect': "fade:2000"}, 	    
       {
       'flags': "layer_apply",
       'width': 1080,
@@ -221,7 +221,7 @@ def post_reel():
       'text': summary
       },
       'color': "white",
-      'effect': "fade:2000"	      
+      'effect': "fade:2000",	      
       'background': "black",
       'width': 400,
       'crop': "fit",
