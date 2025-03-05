@@ -86,7 +86,7 @@ def post_reel():
         print(f"❌ Failed to fetch Instagram caption: {e}")
 
     # 🔹 2. Generate Headline & Image Prompt
-    url = "https://chatgpt-42.p.rapidapi.com/gpt4"
+    url = "https://open-ai21.p.rapidapi.com/chatgpt"
     payload = {
         "messages": [
             {
@@ -110,7 +110,7 @@ def post_reel():
 
     headers = {
         "x-rapidapi-key": "c66b66fd5fmsh2d1f2d4c5d0a073p17161ajsnb75f8dbbac1d",
-        "x-rapidapi-host": "chatgpt-42.p.rapidapi.com",
+        "x-rapidapi-host": "open-ai21.p.rapidapi.com",
         "Content-Type": "application/json"
     }
 
