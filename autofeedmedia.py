@@ -184,7 +184,7 @@ def post_reel():
         return
     music_id = music_public_id  # Removed the trailing comma
 
-    video_url = cloudinary.CloudinaryVideo("bgvideo").video(transformation=[
+    video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
     # Main Image Overlay (Product/Feature Image)
       {
       'overlay': public_id,
