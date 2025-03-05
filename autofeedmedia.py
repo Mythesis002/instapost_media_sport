@@ -205,7 +205,7 @@ def post_reel():
       'gravity': "center",
       'y': -130  # Moves image 100 pixels up
       },
-      {"overlay": f"audio:{music_public_id}", "start_offset": "40", "duration": "15"},
+      {"overlay": f"audio:{music_id}", "start_offset": "40", "duration": "15"},
       {'effect':"volume:1000"},
       {'flags': "layer_apply"},
       {'width': 500, 'crop': "scale"},
@@ -218,7 +218,7 @@ def post_reel():
       'gravity': "center",
       'y': -30,
       'text_align': "center",
-      'text': headline
+      'text': summary
       },
       'color': "white",
       'effect': "fade:2000",
