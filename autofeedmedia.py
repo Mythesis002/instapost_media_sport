@@ -88,25 +88,18 @@ def post_reel():
     # 🔹 2. Generate Headline & Image Prompt
     url = "https://open-ai21.p.rapidapi.com/chatgpt"
     payload = {
-        "messages": [
-            {
-                "role": "system",
-                "content":
-                "You are an AI assistant that specializes in generating high-quality Instagram post elements. "
-                "For any given caption, you must return:\n"
-                "1️⃣ **Keywords for Image Search**: A sentence of  5-7 words for searching images/videos about that event\n"
-                "2️⃣ **Summarized Caption**: A concise and engaging summary of the caption in at least 2 line.\n\n"
-                "Format your response **exactly** like this:\n"
-                "**Keywords:** a shortest 5 word sentense \n"
-                "**Summary:** Your concise and engaging summary here"
-            },
-            {
-                "role": "user",
-                "content": caption_text
-            }
-        ],
-        "web_access": False
-    }
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are an AI assistant that specializes in generating high-quality Instagram post elements. For any given caption, you must return:\n1️⃣ **Keywords for Image Search**: A sentence of 5-7 words for searching images/videos about that event\n2️⃣ **Summarized Caption**: A concise and engaging summary of the caption in at least 2 lines.\n\nFormat your response **exactly** like this:\n**Keywords:** a shortest 5 word sentence\n**Summary:** Your concise and engaging summary here"
+        },
+        {
+            "role": "user",
+            "content": caption_text
+        }
+    ],
+    "web_access": False
+}
 
     headers = {
         "x-rapidapi-key": "c66b66fd5fmsh2d1f2d4c5d0a073p17161ajsnb75f8dbbac1d",
@@ -134,6 +127,7 @@ def post_reel():
         summary = summary_match.group(1).strip() if summary_match else "No summary found"
 
         # Print the results
+        print(result_text)
         print("Keywords:", keywords)
         print("Summary:", summary)
 
@@ -190,51 +184,45 @@ def post_reel():
         return
     music_id = music_public_id  # Removed the trailing comma
 
-    video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
+    video_url = cloudinary.CloudinaryVideo("bgvideo").video(transformation=[
     # Main Image Overlay (Product/Feature Image)
       {
       'overlay': public_id,
-      'width': 400,
-      'height': 400,
-      'crop': "pad",
-      'y': 130,
-      'background': "#000000", 'gravity': "north"
-      },
-      {'background': "#000000", 'gravity': "north", 'height': 1920, 'width': 1080, 'crop': "pad"},
-      {'effect': "gradient_fade:symmetric_pad", 'x': "0.5"},
-      {'effect': 'gen_restore'},
-      {'effect': "fade:2000"},
-      {
-      'flags': "layer_apply",
       'width': 1080,
+      'height': 1920,
       'crop': "pad",
-      'gravity': "center",
-      'y': -130  # Moves image 100 pixels up
+      'background': "auto:predominant_gradient:2:diagonal_desc"
       },
-      {"overlay": f"audio:{music_public_id}", "start_offset": "40", "duration": "15"},
-      {'effect':"volume:1000"},
+      {'effect': 'gen_restore'},
+      {'flags': "layer_apply", 'width': 1920,'crop': "pad"},
+      {"overlay": f"audio:{music_id}", "start_offset": "40", "duration": "15"},
       {'flags': "layer_apply"},
       {'width': 500, 'crop': "scale"},
-
         # Corrected text overlay parameters
       {
       'overlay': {
-      'font_family': "georgia",
-      'font_size': 30,
+      'font_family': "arial",
+      'font_size': 25,
+      'font_weight': "bold",
       'gravity': "center",
-      'y': -30,
-      'text_align': "center",
       'text': summary
       },
-      'color': "white",
-      'effect': "fade:2000",
-      'text_align': "center",
-      'width': 450,
-      'crop': "fit",
-      'gravity': "center",
-      'y': 100,# Align text to the center
-      }
+       'color': "white",
+       'background': "black",
+       'width': 400,
+       'crop': "fit",
+       'gravity': "center",  # Align text to the center
+       'border': "20px_solid_black"  # Padding effect using a border
+       },
+       {'flags': "layer_apply", 'gravity': "north", 'y': 500},
+       {'overlay': {'font_family': "arial", 'font_size': 20, 'font_weight': "bold", 'text': "Thetrendsfeed"}, 'color': "black", 'background': "skyblue", 'radius': 20, 'x': 20, 'y': 20, 'width': 400, 'crop': "fit"},
+       {'flags': "layer_apply", 'gravity': "north", 'y': 110},
+       {'overlay': {'font_family': "arial", 'font_size': 12, 'font_weight': "bold", 'text': "This page is totally handled by ai, which provides trending tech news faster than human!"}, 'color': "white", 'width': 300, 'crop': "fit"},
+       {'flags': "layer_apply", 'gravity': "north", 'y': 160},
+       {'overlay': {'font_family': "arial", 'font_size': 12, 'font_weight': "bold", 'text': "full details in caption"}, 'color': "white", 'width': 300, 'crop': "fit"},
+       {'flags': "layer_apply", 'gravity': "south", 'y': 150}
     ])
+
     match = re.search(r'/webm"><source src="(.*\.mp4)"', str(video_url))
     mp4_url = match.group(1)
     print(mp4_url)
