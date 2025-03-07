@@ -28,7 +28,7 @@ def post_reel():
     url = "https://instagram230.p.rapidapi.com/user/posts"
     querystring = {"username": INSTAGRAM_NICHE_ACCOUNT}
     headers = {
-        "x-rapidapi-key": "c66b66fd5fmsh2d1f2d4c5d0a073p17161ajsnb75f8dbbac1d",
+        "x-rapidapi-key": "c4149d7f42msh169b1ac1d7c079ep17cebfjsn882b5a92dacd",
         "x-rapidapi-host": "instagram230.p.rapidapi.com",
         "Content-Type": "application/json"
     }
