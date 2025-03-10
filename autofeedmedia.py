@@ -91,7 +91,7 @@ def post_reel():
     "messages": [
         {
             "role": "system",
-            "content": "You are an AI assistant that specializes in generating high-quality Instagram post elements. For any given caption, you must return:\n1️⃣ **Keywords for Image Search**: A sentence of 5-7 words for searching images/videos about that event\n2️⃣ **Summarized Caption**: A concise and engaging summary of the caption in at least 2 lines.\n\nFormat your response **exactly** like this:\n**Keywords:** a shortest 5 word sentence\n**Summary:** Your concise and engaging summary here"
+            "content": "You are an AI assistant that specializes in generating high-quality Instagram post elements. For any given caption, you must return:\n1️⃣ **Keywords for Image Search**: A sentence of 5-7 words for searching images/videos about that event\n2️⃣ **Summarized Caption**: A concise and engaging summary of the caption in at least 1 lines (no hashtags).\n\nFormat your response **exactly** like this:\n**Keywords:** a shortest 5 word sentence\n**Summary:** Your concise and engaging headline here"
         },
         {
             "role": "user",
