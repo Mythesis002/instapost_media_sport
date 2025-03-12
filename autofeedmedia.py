@@ -45,7 +45,6 @@ def post_reel():
             # Check if 'music_metadata' and 'music_canonical_id' exist
             if 'music_metadata' in data['items'][0] and data['items'][0]['music_metadata'] and 'music_canonical_id' in data['items'][0]['music_metadata']:
                 music_canonical_id = data['items'][0]['music_metadata']['music_canonical_id']
-		print(music_canonical_id)
             else:
                 # Use the default ID if 'music_canonical_id' is missing or invalid
                 music_canonical_id = "18149596924049565"
@@ -53,7 +52,7 @@ def post_reel():
         else:
             # Handle the case where the expected structure is not found
             print("Error: Unexpected response structure or empty 'items' list.")
-            print(music_canonical_id)  # Print the response for debugging
+              # Print the response for debugging
             return
         url = "https://instagram-scraper-api2.p.rapidapi.com/v1/audio_info"
         querystring = {"audio_canonical_id":music_canonical_id}
