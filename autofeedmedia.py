@@ -235,6 +235,7 @@ def post_reel():
         "video_url": mp4_url,
         "caption": caption_text,
         "media_type": "REELS",
+	"audio_name": "S.T.A.Y.",
         "access_token": ACCESS_TOKEN
     }
 
