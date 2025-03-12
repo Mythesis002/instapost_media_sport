@@ -40,11 +40,17 @@ def post_reel():
         # Check if 'items' is in data and it's not empty before accessing its elements
         if 'items' in data and data['items'] and isinstance(data['items'], list) and len(data['items']) > 0:
             # Access the caption text from the first item in the 'items' list
-            caption_text = data['items'][0]['caption']['text']
+            caption_text = data['items'][1]['caption']['text']
 
             # Check if 'music_metadata' and 'music_canonical_id' exist
-            if 'music_metadata' in data['items'][0] and data['items'][0]['music_metadata'] and 'music_canonical_id' in data['items'][0]['music_metadata']:
-                music_canonical_id = data['items'][0]['music_metadata']['music_canonical_id']
+            if 'music_metadata' in data['items'][1] and data['items'][1]['music_metadata'] and 'music_canonical_id' in data['items'][0]['music_metadata']:
+                music_canonical_id = data['items'][1]['music_metadata']['music_canonical_id']
+                # Check if music_canonical_id is 0
+                if music_canonical_id == 0 or music_canonical_id == "0": #checking for 0 and "0" to avoid typeerror 
+                    music_canonical_id = "18149596924049565"  # Default music ID
+                    print("Using default Music Canonical ID:", music_canonical_id)
+                else:
+                    print("Music Canonical ID:", music_canonical_id)    
             else:
                 # Use the default ID if 'music_canonical_id' is missing or invalid
                 music_canonical_id = "18149596924049565"
@@ -52,7 +58,7 @@ def post_reel():
         else:
             # Handle the case where the expected structure is not found
             print("Error: Unexpected response structure or empty 'items' list.")
-              # Print the response for debugging
+            print(data)  # Print the response for debugging
             return
         url = "https://instagram-scraper-api2.p.rapidapi.com/v1/audio_info"
         querystring = {"audio_canonical_id":music_canonical_id}
@@ -201,7 +207,7 @@ def post_reel():
       'gravity': "center",
       'y': -130  # Moves image 100 pixels up
       },
-      {"overlay": f"audio:{music_id}", "start_offset": "40", "duration": "15"},
+      {"overlay": f"audio:{music_id}", "start_offset": "45", "duration": "15"},
       {'effect':"volume:100"},
       {'flags': "layer_apply"},
       {'width': 500, 'crop': "scale"},
@@ -234,7 +240,7 @@ def post_reel():
         "video_url": mp4_url,
         "caption": caption_text,
         "media_type": "REELS",
-	"audio_name": "S.T.A.Y.",
+	      "audio_name": "S.T.A.Y.",
         "access_token": ACCESS_TOKEN
     }
 
@@ -259,8 +265,3 @@ def post_reel():
     else:
         print("❌ Error: Failed to upload the video.")
 post_reel()
-
-
-
-
-
