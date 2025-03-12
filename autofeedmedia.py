@@ -45,30 +45,27 @@ def post_reel():
             # Check if 'music_metadata' and 'music_canonical_id' exist
             if 'music_metadata' in data['items'][0] and data['items'][0]['music_metadata'] and 'music_canonical_id' in data['items'][0]['music_metadata']:
                 music_canonical_id = data['items'][0]['music_metadata']['music_canonical_id']
+		print(music_canonical_id)
             else:
                 # Use the default ID if 'music_canonical_id' is missing or invalid
                 music_canonical_id = "18149596924049565"
-
                 print("Music Canonical ID:", music_canonical_id)
         else:
             # Handle the case where the expected structure is not found
             print("Error: Unexpected response structure or empty 'items' list.")
-            print(data)  # Print the response for debugging
+            print(music_canonical_id)  # Print the response for debugging
             return
         url = "https://instagram-scraper-api2.p.rapidapi.com/v1/audio_info"
-
         querystring = {"audio_canonical_id":music_canonical_id}
-
         headers = {
          	"x-rapidapi-key": "c4149d7f42msh169b1ac1d7c079ep17cebfjsn882b5a92dacd",
 	        "x-rapidapi-host": "instagram-scraper-api2.p.rapidapi.com"
         }
-
         response = requests.get(url, headers=headers, params=querystring)
         response.raise_for_status()  # Raise an error for bad status codes
         data = response.json()
 
-        print(response.json())
+        
         music_url = data['data']['download_url']
         print(music_url)
         cloudinary.config(
@@ -206,7 +203,7 @@ def post_reel():
       'y': -130  # Moves image 100 pixels up
       },
       {"overlay": f"audio:{music_id}", "start_offset": "40", "duration": "15"},
-      {'effect':"volume:1000"},
+      {'effect':"volume:100"},
       {'flags': "layer_apply"},
       {'width': 500, 'crop': "scale"},
 
