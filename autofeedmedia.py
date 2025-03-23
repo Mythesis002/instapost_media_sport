@@ -208,7 +208,6 @@ def post_reel():
       'y': -130  # Moves image 100 pixels up
       },
       {"overlay": f"audio:{music_id}", "start_offset": "45", "duration": "15"},
-      {'effect':"volume:95"},
       {'flags': "layer_apply"},
       {'width': 500, 'crop': "scale"},
 
@@ -216,6 +215,7 @@ def post_reel():
       {
       'overlay': {
       'font_family': "georgia",
+      'font_weight': "bold",
       'font_size': 30,
       'gravity': "center",
       'y': -30,
