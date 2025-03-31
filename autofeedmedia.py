@@ -15,7 +15,7 @@ payload = {
     "query": "Find the most viral, trending, and controversial news today that is making waves on social media in india. Focus on shocking events, celebrity controversies, bizarre incidents, and highly engaging content that people love. Prioritize news from Instagram, Twitter, and YouTube trends, ensuring it's eye-catching and has maximum engagement. Format the response as follows: \n\n**Headline:** [Insert eye-catching headline]\n\n**Summary:** [Provide a concise summary explaining why it's viral, using engaging storytelling]\n\n**Music:** [Suggest a currently trending music title in India (only the music title, nothing else) that aligns with the mood of the news, based on viral Instagram trends in India. Respond in this format: Music: [song title].]\n\nEnsure the response is structured exactly in this format."
 }
 headers = {
-    "x-rapidapi-key": "628e474f5amsh0457d8f1b4fb50cp16b75cjsn70408f276e9b",
+    "x-rapidapi-key": "c4149d7f42msh169b1ac1d7c079ep17cebfjsn882b5a92dacd",
     "x-rapidapi-host": "ai-deepsearch.p.rapidapi.com",
     "Content-Type": "application/json"
 }
