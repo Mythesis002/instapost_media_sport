@@ -10,13 +10,13 @@ ACCESS_TOKEN = "EAAWYAavlRa4BO8OE7Ho6gtx4a85DRgNMc59ZCpAdsHXNJnbZABREkXovZCKnbo9
 INSTAGRAM_ACCOUNT_ID = "17841468918737662"
 
 # ✅ Step 2: Generate Audio using ElevenLabs
-API_VOICE_KEY = "sk_ae8974753802395a5a08bb6f1aac35dcf9b453b8e0f0674b"
-VOICE_ID = "uZMYHCBjuF62xGy65059"
+API_VOICE_KEY = "sk_dd5aedf32fb7898bf883a90f8a0b65c0c1f3c9c9076ff6e7"
+VOICE_ID = "rvfywjas3inawggBGTqH"
 
 url = "https://ai-deepsearch.p.rapidapi.com/api/search"
 
 payload = {
-    "query": "Find the most viral, trending, and controversial news today that is making waves on social media in India. Focus on shocking events, celebrity controversies, bizarre incidents, and highly engaging content that people love. Prioritize news from Instagram, Twitter, and YouTube trends, ensuring it's eye-catching and has maximum engagement. Format the response as follows: \n\n**Headline:** [Insert eye-catching headline]\n\n**Summary:** [Provide a concise summary explaining why it's viral, using engaging storytelling]\n\n**Music:** [Suggest a currently trending music title in India (only the music title, nothing else) that aligns with the mood of the news, based on viral Instagram trends in India. Respond in this format: Music: [song title].]\n\nEnsure the response is structured exactly in this format."
+    "query": "Find the most viral, trending, and controversial news today that is making waves on social media in India. Focus on shocking events, celebrity controversies, bizarre incidents, and highly engaging content that people love. Prioritize news from Instagram, Twitter, and YouTube trends, ensuring it's eye-catching and has maximum engagement. Format the response as follows: Headline: [Insert an eye-catching, bold, or sensational headline] Summary: [Provide a concise, punchy summary in Hindi, written in Varun Mayya’s style—casual, witty, and loaded with Gen-Z slang, emojis, and dramatic flair. Example: 'so,IT इंडस्ट्री में भूचाल आने वाला है!'] Music: [Suggest a currently trending music title in India (only the song name) that fits the mood of the news, based on viral Instagram/Reels trends. Format: Music: [song title].] Ensure the response is structured exactly like this, with the Hindi summary mimicking Varun Mayya’s tone—relatable, humorous, and attention-grabbing."
 }
 headers = {
     "x-rapidapi-key": "c4149d7f42msh169b1ac1d7c079ep17cebfjsn882b5a92dacd",
@@ -63,21 +63,23 @@ response = requests.get(url, headers=headers, params=querystring)
 if response.status_code == 200:
     data = response.json()
 
-    # Extract the first track's URL
-    first_track = data.get("data", [])[0].get("track", {})
-    first_audio_url = first_track.get("fast_start_progressive_download_url")
-    print(first_audio_url)
-    cloudinary.config(
-                cloud_name="dkr5qwdjd",
-                api_key="797349366477678",
-                api_secret="9HUrfG_i566NzrCZUVxKyCHTG9U"
-    )
-    upload_result = cloudinary.uploader.upload(first_audio_url, resource_type="video")
+    # Check if the 'data' list is not empty before accessing elements
+    if data.get("data", []):
+        first_track = data.get("data", [])[0].get("track", {})
+        first_audio_url = first_track.get("fast_start_progressive_download_url")
+        print(first_audio_url)
+        cloudinary.config(
+                    cloud_name="dkr5qwdjd",
+                    api_key="797349366477678",
+                    api_secret="9HUrfG_i566NzrCZUVxKyCHTG9U"
+        )
+        upload_result = cloudinary.uploader.upload(first_audio_url, resource_type="video")
 
-            # 🔹 Print Public ID
-    music_public_id = upload_result.get("public_id")
-    print(f"✅ Uploaded Successfully! Public ID: {music_public_id}")
-
+                # 🔹 Print Public ID
+        music_public_id = upload_result.get("public_id")
+        print(f"✅ Uploaded Successfully! Public ID: {music_public_id}")
+    else:
+        print("No matching music found.")  # Handle the case where the list is empty
 else:
     print("Error:", response.status_code, response.text)
 # Extract only the first 5 words from the headline
@@ -122,6 +124,7 @@ except requests.exceptions.RequestException as e:
     thumbnail_url = None
 
 # VOICE GENERATION
+summar = summary;
 
 headers = {
     "xi-api-key": API_VOICE_KEY,
@@ -129,13 +132,15 @@ headers = {
 }
 
 data = {
-    "text": summary,
+    "text": summar,
     "voice_settings": {
-        "speed": 1.0,
+        "speed": 1.2,
         "stability": 0.3,
         "similarity_boost": 0.8,
         "style_exaggeration": 0.7
+      
     },
+    "model_id": "eleven_multilingual_v2",
     "output_format": "mp3"
 }
 
