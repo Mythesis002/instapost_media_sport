@@ -9,6 +9,10 @@ import time
 ACCESS_TOKEN = "EAAWYAavlRa4BO8OE7Ho6gtx4a85DRgNMc59ZCpAdsHXNJnbZABREkXovZCKnbo9AlupOjbJ5xYSTBrMIMTVtu9n530I3ZC2JZBuZBpCDzHyjI7ngh8EtCrSvUho9VGZB9Xdxt5JLGNrHwfDsSIqtvxFjefG2t2JsgJpqfZAMCjO8AURp79mU0WAaLA7R"
 INSTAGRAM_ACCOUNT_ID = "17841468918737662"
 
+# ✅ Step 2: Generate Audio using ElevenLabs
+API_VOICE_KEY = "sk_ae8974753802395a5a08bb6f1aac35dcf9b453b8e0f0674b"
+VOICE_ID = "uZMYHCBjuF62xGy65059"
+
 url = "https://ai-deepsearch.p.rapidapi.com/api/search"
 
 payload = {
@@ -117,6 +121,46 @@ except requests.exceptions.RequestException as e:
     print(f"❌ Failed to search for images: {e}")
     thumbnail_url = None
 
+# VOICE GENERATION
+
+headers = {
+    "xi-api-key": API_VOICE_KEY,
+    "Content-Type": "application/json"
+}
+
+data = {
+    "text": summary,
+    "voice_settings": {
+        "speed": 1.0,
+        "stability": 0.3,
+        "similarity_boost": 0.8,
+        "style_exaggeration": 0.7
+    },
+    "output_format": "mp3"
+}
+
+response = requests.post(f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}", headers=headers, json=data)
+
+if response.status_code == 200:
+    print("✅ Audio Generated Successfully!")
+
+    # ✅ Step 3: Upload Audio Directly to Cloudinary
+    audio_file = response.content  # Get audio content
+
+    upload_response = cloudinary.uploader.upload(
+        file=audio_file,
+        resource_type="video",  # Cloudinary treats audio files as "video"
+        format="mp3",
+    )
+    cloudinary_url = upload_response["secure_url"]
+    cloudinary_public_id = upload_response["public_id"]
+
+    print(f"🌍 Cloudinary URL: {cloudinary_url}")
+    print(f"📂 Cloudinary Public ID: {cloudinary_public_id}")
+else:
+    print("❌ Error Generating Audio:", response.text)
+
+
 video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
     # Main Image Overlay (Product/Feature Image)
       {
@@ -138,11 +182,17 @@ video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
       'gravity': "center",
       'y': -130  # Moves image 100 pixels up
       },
-      {"overlay": f"audio:{music_public_id}", "start_offset": "45", "duration": "15"},
+      
+      {"overlay": f"audio:{cloudinary_public_id}",  "duration": "30"}, 
+      {'effect':"volume:100"}, 
+      {'flags': "layer_apply"},
+      {'width': 500, 'crop': "scale"},
+     
+      {"overlay": f"audio:{music_public_id}", "start_offset": "45", "duration": "30"},
+      {'effect':"volume:-85"},
       {'flags': "layer_apply"},
       {'width': 500, 'crop': "scale"},
 
-        # Corrected text overlay parameters
       {
       'overlay': {
       'font_family': "georgia",
