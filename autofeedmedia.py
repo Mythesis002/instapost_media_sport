@@ -1,22 +1,43 @@
 import requests
-import re
+import os
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 import base64
 import time
+import random
+import google.auth
+import httplib2
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaFileUpload
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+import re
+import pickle
+
+# Constantss
+CLIENT_SECRETS_FILE = "client_secrets.json"  # Your OAuth JSON file
+SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+API_SERVICE_NAME = "youtube"
+API_VERSION = "v3"
+
+# Maximum retry attempts for failed uploads
+MAX_RETRIES = 10
+RETRIABLE_EXCEPTIONS = (httplib2.HttpLib2Error, IOError)
+RETRIABLE_STATUS_CODES = [500, 502, 503, 504]
 
 ACCESS_TOKEN = "EAAWYAavlRa4BO8OE7Ho6gtx4a85DRgNMc59ZCpAdsHXNJnbZABREkXovZCKnbo9AlupOjbJ5xYSTBrMIMTVtu9n530I3ZC2JZBuZBpCDzHyjI7ngh8EtCrSvUho9VGZB9Xdxt5JLGNrHwfDsSIqtvxFjefG2t2JsgJpqfZAMCjO8AURp79mU0WAaLA7R"
 INSTAGRAM_ACCOUNT_ID = "17841468918737662"
 
 # ✅ Step 2: Generate Audio using ElevenLabs
-API_VOICE_KEY = "sk_dd5aedf32fb7898bf883a90f8a0b65c0c1f3c9c9076ff6e7"
-VOICE_ID = "rvfywjas3inawggBGTqH"
+API_VOICE_KEY = "sk_aa9b2128c2fb988e43c4969e0327572f8fe305f12c1437a3"
+VOICE_ID = "QkXme8AqeQYABrRfJT20"
 
 url = "https://ai-deepsearch.p.rapidapi.com/api/search"
 
 payload = {
-    "query": "Find the most viral, trending, and controversial news today that is making waves on social media in India. Focus on shocking events, celebrity controversies, bizarre incidents, and highly engaging content that people love. Prioritize news from Instagram, Twitter, and YouTube trends, ensuring it's eye-catching and has maximum engagement. Format the response as follows: Headline: [Insert an eye-catching, bold, or sensational headline] Summary: [Provide a concise, punchy summary in Hindi, written in Varun Mayya’s style—casual, witty, and loaded with Gen-Z slang, emojis, and dramatic flair. Example: 'so,IT इंडस्ट्री में भूचाल आने वाला है!'] Music: [Suggest a currently trending music title in India (only the song name) that fits the mood of the news, based on viral Instagram/Reels trends. Format: Music: [song title].] Ensure the response is structured exactly like this, with the Hindi summary mimicking Varun Mayya’s tone—relatable, humorous, and attention-grabbing."
+    "query": "Find the most viral, trending, and controversial news today that is making waves on social media in India. Focus on shocking events, celebrity controversies, bizarre incidents, and highly engaging content that people love. Prioritize news from Instagram, Twitter, and YouTube trends, ensuring it's eye-catching and has maximum engagement. Format the response as follows: Headline: [Insert an eye-catching, bold, or sensational headline but make it fake news] Summary: [Provide a concise, punchy summary in Hindi, written in Varun Mayya’s style—casual, witty, and loaded with Gen-Z slang, emojis, and dramatic flair. Example: 'so,IT इंडस्ट्री में भूचाल आने वाला है!'] Music: [Suggest a currently trending music title in India (only the song name) that fits the mood of the news, based on viral Instagram/Reels trends. Format: Music: [song title].] Ensure the response is structured exactly like this, with the Hindi summary mimicking Varun Mayya’s tone—relatable, humorous, and attention-grabbing."
 }
 headers = {
     "x-rapidapi-key": "c66b66fd5fmsh2d1f2d4c5d0a073p17161ajsnb75f8dbbac1d",
@@ -54,7 +75,7 @@ url = "https://real-time-instagram-scraper-api1.p.rapidapi.com/v1/search_music"
 querystring = {"search_query": music}
 
 headers = {
-    "x-rapidapi-key": "c4149d7f42msh169b1ac1d7c079ep17cebfjsn882b5a92dacd",
+    "x-rapidapi-key": "c66b66fd5fmsh2d1f2d4c5d0a073p17161ajsnb75f8dbbac1d",
     "x-rapidapi-host": "real-time-instagram-scraper-api1.p.rapidapi.com"
 }
 
@@ -138,7 +159,7 @@ data = {
         "stability": 0.3,
         "similarity_boost": 0.8,
         "style_exaggeration": 0.7
-      
+
     },
     "model_id": "eleven_multilingual_v2",
     "output_format": "mp3"
@@ -187,14 +208,14 @@ video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
       'gravity': "center",
       'y': -130  # Moves image 100 pixels up
       },
-      
-      {"overlay": f"audio:{cloudinary_public_id}",  "duration": "30"}, 
-      {'effect':"volume:100"}, 
+
+      {"overlay": f"audio:{cloudinary_public_id}",  "duration": "30"},
+      {'effect':"volume:100"},
       {'flags': "layer_apply"},
       {'width': 500, 'crop': "scale"},
-     
+
       {"overlay": f"audio:{music_public_id}", "start_offset": "45", "duration": "30"},
-      {'effect':"volume:-75"},
+      {'effect':"volume:-90"},
       {'flags': "layer_apply"},
       {'width': 500, 'crop': "scale"},
 
@@ -250,3 +271,93 @@ if media_id:
         print("✅ Reel Uploaded Successfully!", publish_response.json())
 else:
         print("❌ Error: Failed to upload the video.")
+
+
+# === Step 1: Download Reel video ===
+def download_file(url, filename):
+    """Downloads a file from a URL."""
+    try:
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+        with open(filename, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        print(f"✅ Downloaded {filename} successfully!")
+        return filename
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Error downloading file: {e}")
+        return None
+
+
+# === Step 3: YouTube Upload Helpers ===
+SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+
+def get_authenticated_service():
+    credentials = None
+    if os.path.exists("token.pickle"):
+        with open("token.pickle", "rb") as token:
+            credentials = pickle.load(token)
+
+    if not credentials or not credentials.valid:
+        if credentials and credentials.expired and credentials.refresh_token:
+            credentials.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                "client_secrets.json", SCOPES
+            )
+            credentials = flow.run_local_server(port=0)
+        with open("token.pickle", "wb") as token:
+            pickle.dump(credentials, token)
+
+    return build("youtube", "v3", credentials=credentials)
+
+def initialize_upload(youtube, file, title, description, category, keywords, privacy_status):
+    body = dict(
+        snippet=dict(
+            title=title,
+            description=description,
+            tags=keywords.split(","),
+            categoryId=category
+        ),
+        status=dict(
+            privacyStatus=privacy_status
+        )
+    )
+    media = MediaFileUpload(file, chunksize=-1, resumable=True, mimetype="video/mp4")
+    request = youtube.videos().insert(part="snippet,status", body=body, media_body=media)
+    response = None
+    while response is None:
+        status, response = request.next_chunk()
+        if status:
+            print(f"⬆️ Uploading to YouTube: {int(status.progress() * 100)}%")
+    print("🎉 YouTube upload complete!")
+    return response
+
+# === Main Execution ===
+downloaded_file = download_file(mp4_url, "reel.mp4")
+
+if downloaded_file: # Use actual upload logic
+
+    if media_id:
+        try:
+            youtube = get_authenticated_service()
+            initialize_upload(
+                youtube,
+                downloaded_file,
+                title=headline,
+                description=summary,
+                category="22",  # People & Blogs
+                keywords="instagram, reels, trending, india",
+                privacy_status="public"
+            )
+            print("✅ Reel uploaded to YouTube successfully!")
+
+            os.remove(downloaded_file)
+        except HttpError as e:
+            print(f"❌ An HTTP error occurred: {e}")
+        except Exception as e:
+            print(f"❌ An error occurred: {e}")
+    else:
+        print("❌ Error: Instagram upload failed.")
+else:
+    print("❌ Error: Failed to download the Reel video.")
