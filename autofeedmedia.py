@@ -217,7 +217,7 @@ video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
       {'width': 500, 'crop': "scale"},
 
       {"overlay": f"audio:{music_public_id}", "start_offset": "45"},
-      {'effect':"volume:-90"},
+      {'effect':"volume:-100"},
       {'flags': "layer_apply"},
       {'width': 500, 'crop': "scale"},
 
