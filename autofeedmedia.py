@@ -37,7 +37,7 @@ VOICE_ID = "IvLWq57RKibBrqZGpQrC"
 url = "https://ai-deepsearch.p.rapidapi.com/api/search"
 
 payload = {
-    "query": "Find the most viral, trending, and controversial news today that is making waves on social media in India. Focus on shocking events, celebrity controversies, bizarre incidents, and highly engaging content that people love. Prioritize news from Instagram, Twitter, and YouTube trends, ensuring it's eye-catching and has maximum engagement. Format the response as follows: Headline: [Insert an eye-catching, bold, or sensational headline but make it fake news] Summary: [Provide a concise, punchy summary in Hindi, written in Varun Mayya’s style—casual, witty, and loaded with Gen-Z slang, emojis, and dramatic flair. Example: 'so,IT इंडस्ट्री में भूचाल आने वाला है!'] Music: [Suggest a currently trending music title in India (only the song name) that fits the mood of the news, based on viral Instagram/Reels trends. Format: Music: [song title].] Ensure the response is structured exactly like this, with the Hindi summary mimicking Varun Mayya’s tone—relatable, humorous, and attention-grabbing."
+    "query": "Find the most viral, trending, and controversial news today that is making waves on social media in India. Focus on shocking events, celebrity controversies, bizarre incidents, and highly engaging content that people love. Prioritize news from Instagram, Twitter, and YouTube trends, ensuring it's eye-catching and has maximum engagement. Format the response as follows: Headline: [Insert an eye-catching, bold, or sensational headline but make it real cringe news] Summary: [Provide a concise, punchy summary in Hindi, written in Varun Mayya’s style—casual, witty, and loaded with Gen-Z slang, emojis, and dramatic flair. Example: 'so,IT इंडस्ट्री में भूचाल आने वाला है!'] Music: [Suggest a currently trending music title in India (only the song name) that fits the mood of the news, based on viral Instagram/Reels trends. Format: Music: [song title].] Ensure the response is structured exactly like this, with the Hindi summary mimicking Varun Mayya’s tone—relatable, humorous, and attention-grabbing."
 }
 headers = {
     "x-rapidapi-key": "628e474f5amsh0457d8f1b4fb50cp16b75cjsn70408f276e9b",
@@ -73,39 +73,51 @@ try:
 except requests.exceptions.RequestException as e:
     print("Error:", e)
 
-url = "https://real-time-instagram-scraper-api1.p.rapidapi.com/v1/search_music"
+url = "https://rocketapi-for-developers.p.rapidapi.com/instagram/audio/search"
 
-querystring = {"search_query": music}
-
+payload = {"query": music}
 headers = {
-    "x-rapidapi-key": "c66b66fd5fmsh2d1f2d4c5d0a073p17161ajsnb75f8dbbac1d",
-    "x-rapidapi-host": "real-time-instagram-scraper-api1.p.rapidapi.com"
+    "x-rapidapi-key": "c4149d7f42msh169b1ac1d7c079ep17cebfjsn882b5a92dacd",
+    "x-rapidapi-host": "rocketapi-for-developers.p.rapidapi.com",
+    "Content-Type": "application/json"
 }
 
-response = requests.get(url, headers=headers, params=querystring)
+response = requests.post(url, json=payload, headers=headers)
 
+# Check if request was successful
 if response.status_code == 200:
     data = response.json()
 
-    # Check if the 'data' list is not empty before accessing elements
-    if data.get("data", []):
-        first_track = data.get("data", [])[0].get("track", {})
-        first_audio_url = first_track.get("fast_start_progressive_download_url")
-        print(first_audio_url)
-        cloudinary.config(
-                    cloud_name="dkr5qwdjd",
-                    api_key="797349366477678",
-                    api_secret="9HUrfG_i566NzrCZUVxKyCHTG9U"
-        )
-        upload_result = cloudinary.uploader.upload(first_audio_url, resource_type="video",format="mp3")
+    # Safely extract audio list from nested response
+    audios = data.get("response", {}).get("body", {}).get("audios", [])
 
-                # 🔹 Print Public ID
+    if audios:
+        # Get the first audio URL
+        first_audio_url = audios[0].get("fast_start_progressive_download_url")
+        print("🎵 Found audio URL:", first_audio_url)
+
+        # Cloudinary config
+        cloudinary.config(
+            cloud_name="dkr5qwdjd",
+            api_key="797349366477678",
+            api_secret="9HUrfG_i566NzrCZUVxKyCHTG9U"
+        )
+
+        # Upload audio to Cloudinary as video
+        upload_result = cloudinary.uploader.upload(
+            first_audio_url,
+            resource_type="video",
+            format="mp3"  # optional: Cloudinary may auto-detect
+        )
+
+        # Get Public ID of uploaded audio
         music_public_id = upload_result.get("public_id")
         print(f"✅ Uploaded Successfully! Public ID: {music_public_id}")
+
     else:
-        print("No matching music found.")  # Handle the case where the list is empty
+        print("❌ No matching music found in response.")
 else:
-    print("Error:", response.status_code, response.text)
+    print(f"🚨 Error {response.status_code}: {response.text}")
 # Extract only the first 5 words from the headline
 url = "https://google-search72.p.rapidapi.com/imagesearch"
 
@@ -217,7 +229,7 @@ video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
       {'width': 500, 'crop': "scale"},
 
       {"overlay": f"audio:{music_public_id}", "start_offset": "45"},
-      {'effect':"volume:-100"},
+      {'effect':"volume:-90"},
       {'flags': "layer_apply"},
       {'width': 500, 'crop': "scale"},
 
