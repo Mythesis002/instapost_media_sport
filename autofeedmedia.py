@@ -46,7 +46,7 @@ payload = {
 	"web_access": False
 }
 headers = {
-	"x-rapidapi-key": "628e474f5amsh0457d8f1b4fb50cp16b75cjsn70408f276e9b",
+	"x-rapidapi-key": "c4149d7f42msh169b1ac1d7c079ep17cebfjsn882b5a92dacd",
 	"x-rapidapi-host": "chatgpt-42.p.rapidapi.com",
 	"Content-Type": "application/json"
 }
@@ -208,6 +208,25 @@ else:
     print("❌ Error Generating Audio:", response.text)
 
 
+def remove_emojis(text):
+    emoji_pattern = re.compile(
+        "["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F700-\U0001F77F"  # alchemical symbols
+        u"\U0001F780-\U0001F7FF"  # Geometric Shapes Extended
+        u"\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
+        u"\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
+        u"\U0001FA00-\U0001FA6F"  # Chess Symbols
+        u"\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
+        u"\U00002702-\U000027B0"  # Dingbats
+        u"\U000024C2-\U0001F251"
+        "]+", flags=re.UNICODE)
+    
+    return emoji_pattern.sub(r'', text)
+clean_headline = remove_emojis(headline)
+print(clean_headline)
 video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
     # Main Image Overlay (Product/Feature Image)
       {
@@ -248,7 +267,7 @@ video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
       'gravity': "center",
       'y': -30,
       'text_align': "center",
-      'text': headline
+      'text': clean_headline,
       },
       'color': "white",
       'effect': "fade:2000",
