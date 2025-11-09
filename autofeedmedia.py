@@ -16,13 +16,12 @@ from google.auth.transport.requests import Request
 import re
 import pickle
 
-# Constantss
-CLIENT_SECRETS_FILE = "client_secrets.json"  # Your OAuth JSON file
+# Constants
+CLIENT_SECRETS_FILE = "client_secrets.json"
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 API_SERVICE_NAME = "youtube"
 API_VERSION = "v3"
 
-# Maximum retry attempts for failed uploads
 MAX_RETRIES = 10
 RETRIABLE_EXCEPTIONS = (httplib2.HttpLib2Error, IOError)
 RETRIABLE_STATUS_CODES = [500, 502, 503, 504]
@@ -30,48 +29,53 @@ RETRIABLE_STATUS_CODES = [500, 502, 503, 504]
 ACCESS_TOKEN = "EAAWYAavlRa4BO8OE7Ho6gtx4a85DRgNMc59ZCpAdsHXNJnbZABREkXovZCKnbo9AlupOjbJ5xYSTBrMIMTVtu9n530I3ZC2JZBuZBpCDzHyjI7ngh8EtCrSvUho9VGZB9Xdxt5JLGNrHwfDsSIqtvxFjefG2t2JsgJpqfZAMCjO8AURp79mU0WAaLA7R"
 INSTAGRAM_ACCOUNT_ID = "17841468918737662"
 
-# ✅ Step 2: Generate Audio using ElevenLabs
 API_VOICE_KEY = "sk_ef0e4ae2a70d3bbb680cc6220828625f4b9968d0b0b990a2"
 VOICE_ID = "IvLWq57RKibBrqZGpQrC"
+
+# Cloudinary config (initialize once)
+cloudinary.config(
+    cloud_name="dkr5qwdjd",
+    api_key="797349366477678",
+    api_secret="9HUrfG_i566NzrCZUVxKyCHTG9U"
+)
+
+# Fallback music public ID
+FALLBACK_MUSIC_ID = "autoaibgmusic"
 
 url = "https://chatgpt-42.p.rapidapi.com/gpt4"
 
 payload = {
-	"messages": [
-		{
-			"role": "user",
-			"content": "Find the most viral, trending, and controversial news today that is making waves on social media in India. Focus on shocking events, celebrity controversies, bizarre incidents, and highly engaging content that people love. Prioritize news from Instagram, Twitter, and YouTube trends, ensuring it's eye-catching and has maximum engagement. Format the response as follows: Headline: [Insert an eye-catching, bold, or sensational headline but make it real cringe news] Summary: [Provide a concise, punchy summary in Hindi, written in Varun Mayya’s style—casual, witty, and loaded with Gen-Z slang, emojis, and dramatic flair. Example: 'so,IT इंडस्ट्री में भूचाल आने वाला है!'] Music: [Suggest a currently trending music title in India (only the song name) that fits the mood of the news, based on viral Instagram/Reels trends. Format: Music: [song title].] Ensure the response is structured exactly like this, with the Hindi summary mimicking Varun Mayya’s tone—relatable, humorous, and attention-grabbing."
-		}
-	],
-	"web_access": False
+    "messages": [
+        {
+            "role": "user",
+            "content": "Find the most viral, trending, and controversial news today that is making waves on social media in India. Focus on shocking events, celebrity controversies, bizarre incidents, and highly engaging content that people love. Prioritize news from Instagram, Twitter, and YouTube trends, ensuring it's eye-catching and has maximum engagement. Format the response as follows: Headline: [Insert an eye-catching, bold, or sensational headline but make it real cringe news] Summary: [Provide a concise, punchy summary in Hindi, written in Varun Mayya's style—casual, witty, and loaded with Gen-Z slang, emojis, and dramatic flair. Example: 'so,IT इंडस्ट्री में भूचाल आने वाला है!'] Music: [Suggest a currently trending music title in India (only the song name) that fits the mood of the news, based on viral Instagram/Reels trends. Format: Music: [song title].] Ensure the response is structured exactly like this, with the Hindi summary mimicking Varun Mayya's tone—relatable, humorous, and attention-grabbing."
+        }
+    ],
+    "web_access": False
 }
 headers = {
-	"x-rapidapi-key": "c4149d7f42msh169b1ac1d7c079ep17cebfjsn882b5a92dacd",
-	"x-rapidapi-host": "chatgpt-42.p.rapidapi.com",
-	"Content-Type": "application/json"
+    "x-rapidapi-key": "c4149d7f42msh169b1ac1d7c079ep17cebfjsn882b5a92dacd",
+    "x-rapidapi-host": "chatgpt-42.p.rapidapi.com",
+    "Content-Type": "application/json"
 }
 
 try:
     response = requests.post(url, json=payload, headers=headers)
-    response.raise_for_status()  # Raise an error for bad status codes
+    response.raise_for_status()
     response_data = response.json()
     print(response_data)
 
-    # Extract result string directly
     result_string = response_data.get("result", "")
 
-    # Extract headline, summary, and music using regex
     headline_match = re.search(r"Headline:\s*(.*?)\n", result_string)
     summary_match = re.search(r"Summary:\s*(.*?)\n", result_string, re.DOTALL)
     music_match = re.search(r"Music:\s*(.*?)(?=\n|$)", result_string)
 
-    # Remove any unwanted `**` or extra formatting around the result
     headline = headline_match.group(1).strip().replace('**', '') if headline_match else "No headline found"
     summary = summary_match.group(1).strip().replace('**', '') if summary_match else "No summary found"
     full_music = music_match.group(1).strip().replace('*', "").replace('.', '') if music_match else "No music found"
     music_words = full_music.split()
     music = ' '.join(music_words[:2]) if music_words else "No music found"
-
 
     print("Headline:", headline)
     print("Summary:", summary)
@@ -79,6 +83,9 @@ try:
 
 except requests.exceptions.RequestException as e:
     print("Error:", e)
+
+# ========== MUSIC SEARCH WITH FALLBACK ==========
+music_public_id = FALLBACK_MUSIC_ID  # Default to fallback
 
 url = "https://rocketapi-for-developers.p.rapidapi.com/instagram/audio/search"
 
@@ -89,43 +96,40 @@ headers = {
     "Content-Type": "application/json"
 }
 
-response = requests.post(url, json=payload, headers=headers)
+try:
+    response = requests.post(url, json=payload, headers=headers)
 
-# Check if request was successful
-if response.status_code == 200:
-    data = response.json()
+    if response.status_code == 200:
+        data = response.json()
+        audios = data.get("response", {}).get("body", {}).get("audios", [])
 
-    # Safely extract audio list from nested response
-    audios = data.get("response", {}).get("body", {}).get("audios", [])
+        if audios:
+            first_audio_url = audios[0].get("fast_start_progressive_download_url")
+            if first_audio_url:
+                print("🎵 Found audio URL:", first_audio_url)
 
-    if audios:
-        # Get the first audio URL
-        first_audio_url = audios[0].get("fast_start_progressive_download_url")
-        print("🎵 Found audio URL:", first_audio_url)
+                # Upload audio to Cloudinary
+                upload_result = cloudinary.uploader.upload(
+                    first_audio_url,
+                    resource_type="video",
+                    format="mp3"
+                )
 
-        # Cloudinary config
-        cloudinary.config(
-            cloud_name="dkr5qwdjd",
-            api_key="797349366477678",
-            api_secret="9HUrfG_i566NzrCZUVxKyCHTG9U"
-        )
-
-        # Upload audio to Cloudinary as video
-        upload_result = cloudinary.uploader.upload(
-            first_audio_url,
-            resource_type="video",
-            format="mp3"  # optional: Cloudinary may auto-detect
-        )
-
-        # Get Public ID of uploaded audio
-        music_public_id = upload_result.get("public_id")
-        print(f"✅ Uploaded Successfully! Public ID: {music_public_id}")
-
+                music_public_id = upload_result.get("public_id")
+                print(f"✅ Uploaded Music Successfully! Public ID: {music_public_id}")
+            else:
+                print(f"⚠️ No audio URL found. Using fallback music: {FALLBACK_MUSIC_ID}")
+        else:
+            print(f"⚠️ No matching music found. Using fallback music: {FALLBACK_MUSIC_ID}")
     else:
-        print("❌ No matching music found in response.")
-else:
-    print(f"🚨 Error {response.status_code}: {response.text}")
-# Extract only the first 5 words from the headline
+        print(f"⚠️ Music search failed (Status {response.status_code}). Using fallback music: {FALLBACK_MUSIC_ID}")
+
+except Exception as e:
+    print(f"⚠️ Music search error: {e}. Using fallback music: {FALLBACK_MUSIC_ID}")
+
+print(f"🎵 Final Music Public ID: {music_public_id}")
+
+# ========== IMAGE SEARCH ==========
 url = "https://google-search72.p.rapidapi.com/imagesearch"
 
 querystring = {"q": headline, "gl": "in", "lr": "lang_en", "num": "1", "start": "0"}
@@ -137,27 +141,17 @@ headers = {
 
 try:
     response = requests.get(url, params=querystring, headers=headers)
-    response.raise_for_status()  # Raise an error for bad status codes
+    response.raise_for_status()
 
-    image_data_list = response.json().get("items", [])  # Extract "items" safely
+    image_data_list = response.json().get("items", [])
 
     if image_data_list and "thumbnailImageUrl" in image_data_list[0]:
-        # Extract the thumbnail image URL
         thumbnail_url = image_data_list[0]["thumbnailImageUrl"]
         print("✅ Thumbnail Image URL:", thumbnail_url)
 
-        # Upload image to Cloudinary
-        cloudinary.config(
-            cloud_name="dkr5qwdjd",
-            api_key="797349366477678",
-            api_secret="9HUrfG_i566NzrCZUVxKyCHTG9U"
-        )
         upload_result = cloudinary.uploader.upload(thumbnail_url, folder="Mythesis_images")
-
-        # Get image URL from Cloudinary
         public_id = upload_result.get("public_id", "").replace("/", ":")
         print("✅ Uploaded Image URL:", public_id)
-
     else:
         print("❌ Error: 'thumbnailImageUrl' key not found in the response or response list is empty.")
         thumbnail_url = None
@@ -166,8 +160,7 @@ except requests.exceptions.RequestException as e:
     print(f"❌ Failed to search for images: {e}")
     thumbnail_url = None
 
-
-
+# ========== ELEVENLABS VOICE GENERATION ==========
 headers = {
     "xi-api-key": API_VOICE_KEY,
     "Content-Type": "application/json"
@@ -180,7 +173,6 @@ data = {
         "stability": 0.3,
         "similarity_boost": 0.8,
         "style_exaggeration": 0.7
-
     },
     "model_id": "eleven_multilingual_v2",
     "output_format": "mp3"
@@ -191,12 +183,11 @@ response = requests.post(f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID
 if response.status_code == 200:
     print("✅ Audio Generated Successfully!")
 
-    # ✅ Step 3: Upload Audio Directly to Cloudinary
-    audio_file = response.content  # Get audio content
+    audio_file = response.content
 
     upload_response = cloudinary.uploader.upload(
         file=audio_file,
-        resource_type="video",  # Cloudinary treats audio files as "video"
+        resource_type="video",
         format="mp3"
     )
     cloudinary_url = upload_response["secure_url"]
@@ -207,89 +198,90 @@ if response.status_code == 200:
 else:
     print("❌ Error Generating Audio:", response.text)
 
-
+# ========== VIDEO GENERATION ==========
 def remove_emojis(text):
     emoji_pattern = re.compile(
         "["
-        u"\U0001F600-\U0001F64F"  # emoticons
-        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-        u"\U0001F680-\U0001F6FF"  # transport & map symbols
-        u"\U0001F700-\U0001F77F"  # alchemical symbols
-        u"\U0001F780-\U0001F7FF"  # Geometric Shapes Extended
-        u"\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
-        u"\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
-        u"\U0001FA00-\U0001FA6F"  # Chess Symbols
-        u"\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
-        u"\U00002702-\U000027B0"  # Dingbats
+        u"\U0001F600-\U0001F64F"
+        u"\U0001F300-\U0001F5FF"
+        u"\U0001F680-\U0001F6FF"
+        u"\U0001F700-\U0001F77F"
+        u"\U0001F780-\U0001F7FF"
+        u"\U0001F800-\U0001F8FF"
+        u"\U0001F900-\U0001F9FF"
+        u"\U0001FA00-\U0001FA6F"
+        u"\U0001FA70-\U0001FAFF"
+        u"\U00002702-\U000027B0"
         u"\U000024C2-\U0001F251"
         "]+", flags=re.UNICODE)
     
     return emoji_pattern.sub(r'', text)
+
 clean_headline = remove_emojis(headline)
 print(clean_headline)
+
 video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
-    # Main Image Overlay (Product/Feature Image)
-      {
-      'overlay': public_id,
-      'width': 400,
-      'height': 400,
-      'crop': "pad",
-      'y': 130,
-      'background': "#000000", 'gravity': "north"
-      },
-      {'background': "#000000", 'gravity': "north", 'height': 1920, 'width': 1080, 'crop': "pad"},
-      {'effect': "gradient_fade:symmetric_pad", 'x': "0.5"},
-      {'effect': 'gen_restore'},
-      {'effect': "fade:2000"},
-      {
-      'flags': "layer_apply",
-      'width': 1080,
-      'crop': "pad",
-      'gravity': "center",
-      'y': -130  # Moves image 100 pixels up
-      },
-
-      {"overlay": f"audio:{cloudinary_public_id}"},
-      {'effect':"volume:100"},
-      {'flags': "layer_apply"},
-      {'width': 500, 'crop': "scale"},
-
-      {"overlay": f"audio:{music_public_id}", "start_offset": "45"},
-      {'effect':"volume:-90"},
-      {'flags': "layer_apply"},
-      {'width': 500, 'crop': "scale"},
-
-      {
-      'overlay': {
-      'font_family': "georgia",
-      'font_weight': "bold",
-      'font_size': 30,
-      'gravity': "center",
-      'y': -30,
-      'text_align': "center",
-      'text': clean_headline,
-      },
-      'color': "white",
-      'effect': "fade:2000",
-      'text_align': "center",
-      'width': 450,
-      'crop': "fit",
-      'gravity': "center",
-      'y': 100,# Align text to the center
-      }
-    ])
+    {
+        'overlay': public_id,
+        'width': 400,
+        'height': 400,
+        'crop': "pad",
+        'y': 130,
+        'background': "#000000",
+        'gravity': "north"
+    },
+    {'background': "#000000", 'gravity': "north", 'height': 1920, 'width': 1080, 'crop': "pad"},
+    {'effect': "gradient_fade:symmetric_pad", 'x': "0.5"},
+    {'effect': 'gen_restore'},
+    {'effect': "fade:2000"},
+    {
+        'flags': "layer_apply",
+        'width': 1080,
+        'crop': "pad",
+        'gravity': "center",
+        'y': -130
+    },
+    {"overlay": f"audio:{cloudinary_public_id}"},
+    {'effect': "volume:100"},
+    {'flags': "layer_apply"},
+    {'width': 500, 'crop': "scale"},
+    {"overlay": f"audio:{music_public_id}", "start_offset": "45"},
+    {'effect': "volume:-90"},
+    {'flags': "layer_apply"},
+    {'width': 500, 'crop': "scale"},
+    {
+        'overlay': {
+            'font_family': "georgia",
+            'font_weight': "bold",
+            'font_size': 30,
+            'gravity': "center",
+            'y': -30,
+            'text_align': "center",
+            'text': clean_headline,
+        },
+        'color': "white",
+        'effect': "fade:2000",
+        'text_align': "center",
+        'width': 450,
+        'crop': "fit",
+        'gravity': "center",
+        'y': 100,
+    }
+])
 
 match = re.search(r'/webm"><source src="(.*\.mp4)"', str(video_url))
 mp4_url = match.group(1)
 print(mp4_url)
+
+# ========== INSTAGRAM UPLOAD ==========
 upload_url = f"https://graph.facebook.com/v18.0/{INSTAGRAM_ACCOUNT_ID}/media"
 payload = {
-        "video_url": mp4_url,
-        "caption": summary,
-        "media_type": "REELS",
-	      "audio_name": "S.T.A.Y.",
-        "access_token": ACCESS_TOKEN
-    }
+    "video_url": mp4_url,
+    "caption": summary,
+    "media_type": "REELS",
+    "audio_name": "S.T.A.Y.",
+    "access_token": ACCESS_TOKEN
+}
 
 response = requests.post(upload_url, data=payload)
 response_data = response.json()
@@ -299,21 +291,20 @@ media_id = response_data.get("id")
 print(media_id)
 
 if media_id:
-        print("⏳ Waiting for Instagram to process the video...")
-        time.sleep(140)
+    print("⏳ Waiting for Instagram to process the video...")
+    time.sleep(140)
 
-        publish_url = f"https://graph.facebook.com/v18.0/{INSTAGRAM_ACCOUNT_ID}/media_publish"
-        publish_payload = {
-            "creation_id": media_id,
-            "access_token": ACCESS_TOKEN
-        }
-        publish_response = requests.post(publish_url, data=publish_payload)
-        print("✅ Reel Uploaded Successfully!", publish_response.json())
+    publish_url = f"https://graph.facebook.com/v18.0/{INSTAGRAM_ACCOUNT_ID}/media_publish"
+    publish_payload = {
+        "creation_id": media_id,
+        "access_token": ACCESS_TOKEN
+    }
+    publish_response = requests.post(publish_url, data=publish_payload)
+    print("✅ Reel Uploaded Successfully!", publish_response.json())
 else:
-        print("❌ Error: Failed to upload the video.")
+    print("❌ Error: Failed to upload the video.")
 
-
-# === Step 1: Download Reel video ===
+# ========== YOUTUBE UPLOAD ==========
 def download_file(url, filename):
     """Downloads a file from a URL."""
     try:
@@ -327,10 +318,6 @@ def download_file(url, filename):
     except requests.exceptions.RequestException as e:
         print(f"❌ Error downloading file: {e}")
         return None
-
-
-# === Step 3: YouTube Upload Helpers ===
-SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 
 def get_authenticated_service():
     credentials = None
@@ -373,11 +360,9 @@ def initialize_upload(youtube, file, title, description, category, keywords, pri
     print("🎉 YouTube upload complete!")
     return response
 
-# === Main Execution ===
 downloaded_file = download_file(mp4_url, "reel.mp4")
 
-if downloaded_file: # Use actual upload logic
-
+if downloaded_file:
     if media_id:
         try:
             youtube = get_authenticated_service()
@@ -386,7 +371,7 @@ if downloaded_file: # Use actual upload logic
                 downloaded_file,
                 title=headline,
                 description=summary,
-                category="22",  # People & Blogs
+                category="22",
                 keywords="instagram, reels, trending, india",
                 privacy_status="public"
             )
