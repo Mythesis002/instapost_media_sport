@@ -217,8 +217,28 @@ def remove_emojis(text):
     
     return emoji_pattern.sub(r'', text)
 
+def sanitize_for_youtube(text):
+    """Clean text for YouTube title - remove emojis, extra quotes, and limit length"""
+    # Remove emojis
+    text = remove_emojis(text)
+    # Remove extra quotes and special formatting
+    text = text.replace('"', '').replace("'", '').replace('**', '')
+    # Remove multiple spaces
+    text = ' '.join(text.split())
+    # Strip whitespace
+    text = text.strip()
+    # YouTube title max is 100 chars, keep it safe at 95
+    if len(text) > 95:
+        text = text[:95].rsplit(' ', 1)[0]  # Cut at last space before 95
+    # Ensure we have a valid title
+    if not text or len(text) < 3:
+        text = "Trending News Update"
+    return text
+
 clean_headline = remove_emojis(headline)
-print(clean_headline)
+youtube_title = sanitize_for_youtube(headline)
+print("Clean Headline (for video):", clean_headline)
+print("YouTube Title:", youtube_title)
 
 video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
     {
@@ -369,8 +389,8 @@ if downloaded_file:
             initialize_upload(
                 youtube,
                 downloaded_file,
-                title=headline,
-                description=summary,
+                title=youtube_title,  # Use sanitized title
+                description=summary[:4900] if summary else "Trending news update",  # YouTube desc max 5000 chars
                 category="22",
                 keywords="instagram, reels, trending, india",
                 privacy_status="public"
