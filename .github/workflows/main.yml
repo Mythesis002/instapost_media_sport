@@ -2,7 +2,7 @@ name: Post Instagram Reel Daily
 
 on:
   schedule:
-    - cron: "30 6 * * *"  # Runs daily at 5:00 AM UTC (10:30 AM IST)
+    - cron: "30 12 * * *"  # Runs daily at 12:30 PM UTC (6:00 PM IST)
   workflow_dispatch:  # Allows manual trigger if needed
 
 jobs:
@@ -15,10 +15,11 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'  # Use latest Python
+          python-version: '3.11'
 
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
+
       - name: Run Python Script
         run: python autofeedmedia.py
