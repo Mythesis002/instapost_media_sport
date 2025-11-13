@@ -22,4 +22,4 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Python Script
-        run: python autofeedmedi
+        run: python autofeedmedia.py
