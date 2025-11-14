@@ -271,7 +271,7 @@ video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
       'gravity': "center",
       'y': -30,
       'text_align': "center",
-      'text': clean_headline,
+      'text': clean_headline
       }
       },
       {
