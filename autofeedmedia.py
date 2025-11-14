@@ -32,7 +32,7 @@ INSTAGRAM_ACCOUNT_ID = "17841468918737662"
 
 # ✅ Step 2: Generate Audio using ElevenLabs
 API_VOICE_KEY = "sk_4d9f7a480386580cdd09de337f30e734f6d8b79d81385fb6"
-VOICE_ID = "iWNf11sz1GrUE4ppxTOL"
+VOICE_ID = "WeK8ylKjTV2trMlayizC"
 
 url = "https://chatgpt-42.p.rapidapi.com/gpt4"
 
@@ -181,9 +181,9 @@ data = {
     "text": summary,
     "voice_settings": {
         "speed": 1.2,
-        "stability": 0.3,
+        "stability": 0.5,
         "similarity_boost": 0.8,
-        "style_exaggeration": 0.7
+        "style_exaggeration": 0.2
 
     },
     "model_id": "eleven_multilingual_v2",
