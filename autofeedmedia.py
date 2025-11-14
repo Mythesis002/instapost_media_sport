@@ -40,11 +40,12 @@ payload = {
     "messages": [
         {
             "role": "user",
-            "content": """Find today's most viral, controversial news in India that's trending on Instagram, Twitter, or YouTube. Use this exact format:
+            "content": """Find today's most viral and controversial news in India that is trending on Instagram, Twitter, or YouTube. Output MUST follow this exact format:
 
-Headline: [real & dramatic and crizy for that can hook]
-Summary: [funny, Hindi Gen-Z tone for 45sec like Varun Mayya — short, casual,min 4 lines without emojis]
-Music: [ONLY the clean song title — no quotes, dashes, or artist name]]"""
+Headline: [short, dramatic, shocking, and click-worthy — something that hooks instantly]
+Summary: [write in a casual, funny, Gen-Z Hindi tone, like Varun Mayya's style — 4-6 lines, conversational, engaging, no emojis, for ~45 seconds spoken]
+Music: [ONLY the clean song title — do not include quotes, dashes, or artist names]
+"""
         }
     ],
     "web_access": True  # Only if supported by your endpoint
