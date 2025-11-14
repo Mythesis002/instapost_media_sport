@@ -242,7 +242,7 @@ video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
       'background': "#000000", 'gravity': "north"
       },
       {'background': "#000000", 'gravity': "north", 'height': 1920, 'width': 1080, 'crop': "pad"},
-      {'effect': "gradient_fade:symmetric_pad", 'x': "0.5"},
+      {'effect': "gradient_fade:symmetric_pad", 'x': "0.3"},
       {'effect': 'gen_restore'},
       {'effect': "fade:2000"},
       {
