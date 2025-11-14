@@ -42,8 +42,8 @@ payload = {
             "role": "user",
             "content": """Find today's most viral, controversial news in India that's trending on Instagram, Twitter, or YouTube. Use this exact format:
 
-Headline: [real & dramatic]
-Summary: [funny, Hindi Gen-Z tone for 24sec like Varun Mayya — short, casual, with emojis]
+Headline: [real & dramatic and crizy for that can hook]
+Summary: [funny, Hindi Gen-Z tone for 45sec like Varun Mayya — short, casual,min 4 lines without emojis]
 Music: [ONLY the clean song title — no quotes, dashes, or artist name]]"""
         }
     ],
@@ -229,8 +229,31 @@ def remove_emojis(text):
         "]+", flags=re.UNICODE)
 
     return emoji_pattern.sub(r'', text)
+def sanitize_for_youtube(text):
+    """Clean text for YouTube title - remove emojis, extra quotes, and limit length"""
+    # Remove emojis
+    text = remove_emojis(text)
+    # Remove extra quotes and special formatting
+    text = text.replace('"', '').replace("'", '').replace('**', '')
+    # Remove multiple spaces
+    text = ' '.join(text.split())
+    # Strip whitespace
+    text = text.strip()
+    # YouTube title max is 100 chars, keep it safe at 95
+    if len(text) > 95:
+        text = text[:95].rsplit(' ', 1)[0]  # Cut at last space before 95
+    # Ensure we have a valid title
+    if not text or len(text) < 3:
+        text = "Trending News Update"
+    return text
+
 clean_headline = remove_emojis(headline)
 print(clean_headline)
+youtube_title = sanitize_for_youtube(headline)
+print("Clean Headline (for video):", clean_headline)
+print("YouTube Title:", youtube_title)
+
+
 video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
     # Main Image Overlay (Product/Feature Image)
       {
@@ -272,16 +295,14 @@ video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
       'y': -30,
       'text_align': "center",
       'text': clean_headline
-      }
       },
-      {
       'color': "white",
       'effect': "fade:2000",
       'text_align': "center",
       'width': 450,
       'crop': "fit",
       'gravity': "center",
-      'y': 100
+      'y': 100,# Align text to the center
       },
       {
         'width': 1080,
