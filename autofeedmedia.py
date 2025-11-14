@@ -43,7 +43,7 @@ payload = {
             "content": """Find today's most viral, controversial news in India that's trending on Instagram, Twitter, or YouTube. Use this exact format:
 
 Headline: [real & dramatic]
-Summary: [funny, Hindi Gen-Z tone like Varun Mayya — short, casual, with emojis]
+Summary: [funny, Hindi Gen-Z tone for 20sec like Varun Mayya — short, casual, with emojis]
 Music: [ONLY the clean song title — no quotes, dashes, or artist name]]"""
         }
     ],
@@ -180,7 +180,7 @@ headers = {
 data = {
     "text": summary,
     "voice_settings": {
-        "speed": 1.3,
+        "speed": 1.2,
         "stability": 0.3,
         "similarity_boost": 0.8,
         "style_exaggeration": 0.7
@@ -271,16 +271,27 @@ video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
       'gravity': "center",
       'y': -30,
       'text_align': "center",
-      'text': clean_headline,
+      'text': headline,
+      }
       },
+      {
       'color': "white",
       'effect': "fade:2000",
       'text_align': "center",
       'width': 450,
       'crop': "fit",
       'gravity': "center",
-      'y': 100,# Align text to the center
-      }
+      'y': 100
+      },
+      {
+        'width': 1080,
+        'height': 1920,
+        'crop': 'fill',
+        'quality': 'auto:best',
+        'bit_rate': '8000k',
+        'fetch_format': 'mp4',
+        'flags': 'progressive:steep'  # ensures streamable HD
+       }
     ])
 
 match = re.search(r'/webm"><source src="(.*\.mp4)"', str(video_url))
