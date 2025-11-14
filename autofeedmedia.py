@@ -271,7 +271,7 @@ video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
       'gravity': "center",
       'y': -30,
       'text_align': "center",
-      'text': headline,
+      'text': clean_headline,
       }
       },
       {
@@ -287,14 +287,11 @@ video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
         'width': 1080,
         'height': 1920,
         'crop': 'fill',
-        'quality': '100',           # MAX quality
-        'bit_rate': '25000k',       # 25 Mbps ideal for YouTube
-        'codec': 'h264',
-        'audio_codec': 'aac',
-        'audio_bit_rate': '320k',
+        'quality': 'auto:best',
+        'bit_rate': '8000k',
         'fetch_format': 'mp4',
-        'flags': 'progressive:steep'
-    }
+        'flags': 'progressive:steep'  # ensures streamable HD
+       }
     ])
 
 match = re.search(r'/webm"><source src="(.*\.mp4)"', str(video_url))
