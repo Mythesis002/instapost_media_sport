@@ -43,7 +43,7 @@ payload = {
             "content": """Find today's most viral, controversial news in India that's trending on Instagram, Twitter, or YouTube. Use this exact format:
 
 Headline: [real & dramatic]
-Summary: [funny, Hindi Gen-Z tone for 24sec like Varun Mayya — short, casual, with emojis]
+Summary: [funny, Hindi Gen-Z tone for 24sec like Varun Mayya — short, casual, in hindi]
 Music: [ONLY the clean song title — no quotes, dashes, or artist name]]
 """
         }
