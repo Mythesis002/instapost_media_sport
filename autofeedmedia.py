@@ -40,18 +40,18 @@ payload = {
     "messages": [
         {
             "role": "user",
-            "content": """Find today's most viral, controversial news in India that's trending on Instagram, Twitter, or YouTube. Use this exact format:
+            "content": """Find today's most viral and controversial news in India that is trending on Instagram, Twitter, or YouTube. Output MUST follow this exact format:
 
-Headline: [real & dramatic]
-Summary: [funny, Hindi Gen-Z tone for 24sec like Varun Mayya — short, casual, in hindi]
-Music: [ONLY the clean song title — no quotes, dashes, or artist name]]
+Headline: [short, dramatic, shocking, and click-worthy — something that hooks instantly in hinglish]
+Summary: [write in a casual, funny, Gen-Z Hindi tone, like Varun Mayya's style — 4-6 lines, conversational, engaging, no emojis, for ~45 seconds spoken]
+Music: [ONLY the clean song title — do not include quotes, dashes, or artist names]
 """
         }
     ],
     "web_access": True  # Only if supported by your endpoint
 }
 headers = {
-	"x-rapidapi-key": "28548f0c8bmsh0e3e539eee59f91p13506ejsn31b89124ee0d",
+	"x-rapidapi-key": "c66b66fd5fmsh2d1f2d4c5d0a073p17161ajsnb75f8dbbac1d",
 	"x-rapidapi-host": "chatgpt-42.p.rapidapi.com",
 	"Content-Type": "application/json"
 }
@@ -136,7 +136,7 @@ url = "https://google-search72.p.rapidapi.com/imagesearch"
 querystring = {"q": headline, "gl": "in", "lr": "lang_en", "num": "1", "start": "0"}
 
 headers = {
-    "x-rapidapi-key": "28548f0c8bmsh0e3e539eee59f91p13506ejsn31b89124ee0d",
+    "x-rapidapi-key": "10b8da21fdmsh4f39a747a946114p10fd17jsn10b23e1e58d1",
     "x-rapidapi-host": "google-search72.p.rapidapi.com"
 }
 
