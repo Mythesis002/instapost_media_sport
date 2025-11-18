@@ -51,7 +51,7 @@ Music: [ONLY the clean song title — no quotes, dashes, or artist name]]
     "web_access": True  # Only if supported by your endpoint
 }
 headers = {
-	"x-rapidapi-key": "c66b66fd5fmsh2d1f2d4c5d0a073p17161ajsnb75f8dbbac1d",
+	"x-rapidapi-key": "28548f0c8bmsh0e3e539eee59f91p13506ejsn31b89124ee0d",
 	"x-rapidapi-host": "chatgpt-42.p.rapidapi.com",
 	"Content-Type": "application/json"
 }
@@ -136,7 +136,7 @@ url = "https://google-search72.p.rapidapi.com/imagesearch"
 querystring = {"q": headline, "gl": "in", "lr": "lang_en", "num": "1", "start": "0"}
 
 headers = {
-    "x-rapidapi-key": "628e474f5amsh0457d8f1b4fb50cp16b75cjsn70408f276e9b",
+    "x-rapidapi-key": "28548f0c8bmsh0e3e539eee59f91p13506ejsn31b89124ee0d",
     "x-rapidapi-host": "google-search72.p.rapidapi.com"
 }
 
