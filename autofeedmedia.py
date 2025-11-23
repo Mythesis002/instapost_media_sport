@@ -40,8 +40,7 @@ payload = {
     "messages": [
         {
             "role": "user",
-            "content": """Find today's most viral and controversial news in India that is trending on Instagram, Twitter, or YouTube. Output MUST follow this exact format:
-
+            "content": """Find the most viral, trending, and controversial news today that is making waves on social media in India. Focus on shocking events, celebrity controversies, bizarre incidents, and highly engaging content that people love. Prioritize news from Instagram, Twitter, and YouTube trends, ensuring it's eye-catching and has maximum engagement. Output MUST follow this exact format:
 Headline: [short, dramatic, shocking, and click-worthy — something that hooks instantly in hinglish]
 Summary: [write in a casual, funny, Gen-Z Hindi tone, like Varun Mayya's style — 4-6 lines, conversational, engaging, no emojis, for ~45 seconds spoken]
 Music: [ONLY the clean song title — do not include quotes, dashes, or artist names]
