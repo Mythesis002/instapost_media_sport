@@ -39,7 +39,7 @@ url = "https://chatgpt-42.p.rapidapi.com/gpt4"
 
 # Updated Prompt: Stronger instruction on JSON syntax
 prompt_content = """
-Find the most viral, trending, and controversial news today that is making waves on social media in India. 
+Find the most viral, trending, and controversial news that is making waves on social media in India.(dont say anyhing like i dont know , i m strictly asking) 
 Focus on shocking events, celebrity controversies, bizarre incidents, and high-engagement content from Instagram, Twitter (X), and YouTube.
 
 OUTPUT FORMAT:
@@ -306,11 +306,6 @@ video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
       'gravity': "center",
       'y': -130  # Moves image 100 pixels up
       },
-
-      {"overlay": f"audio:{cloudinary_public_id}"},
-      {'effect':"volume:100"},
-      {'flags': "layer_apply"},
-      {'width': 500, 'crop': "scale"},
 
       {"overlay": f"audio:{music_public_id}", "start_offset": "45"},
       {'effect':"volume:50"},
