@@ -62,7 +62,7 @@ payload = {
 }
 
 headers = {
-    "x-rapidapi-key": "c66b66fd5fmsh2d1f2d4c5d0a073p17161ajsnb75f8dbbac1d",
+    "x-rapidapi-key": "28548f0c8bmsh0e3e539eee59f91p13506ejsn31b89124ee0d",
     "x-rapidapi-host": "chatgpt-42.p.rapidapi.com",
     "Content-Type": "application/json"
 }
@@ -307,6 +307,10 @@ video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
       'y': -130  # Moves image 100 pixels up
       },
 
+      {"overlay": f"audio:{cloudinary_public_id}"},
+      {'effect':"volume:100"},
+      {'flags': "layer_apply"},
+      {'width': 500, 'crop': "scale"},
 
       {"overlay": f"audio:{music_public_id}", "start_offset": "45"},
       {'effect':"volume:50"},
