@@ -15,6 +15,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 import re
 import pickle
+import json
 
 # Constantss
 CLIENT_SECRETS_FILE = "client_secrets.json"  # Your OAuth JSON file
@@ -36,53 +37,83 @@ VOICE_ID = "WeK8ylKjTV2trMlayizC"
 
 url = "https://chatgpt-42.p.rapidapi.com/gpt4"
 
+# Updated Prompt: Stronger instruction on JSON syntax
+prompt_content = """
+Find the most viral, trending, and controversial news today that is making waves on social media in India. 
+Focus on shocking events, celebrity controversies, bizarre incidents, and high-engagement content from Instagram, Twitter (X), and YouTube.
+
+OUTPUT FORMAT:
+Return a STRICT JSON object. Ensure there is a comma separating every field.
+{
+  "headline": "Short clicky hinglish headline",
+  "summary": "4-6 lines casual Hindi summary (no emojis)",
+  "music": "Song Name Only"
+}
+"""
+
 payload = {
     "messages": [
         {
             "role": "user",
-            "content": """Find the most viral, trending, and controversial news today that is making waves on social media in India. Focus on shocking events, celebrity controversies, bizarre incidents, and highly engaging content that people love. Prioritize news from Instagram, Twitter, and YouTube trends, ensuring it's eye-catching and has maximum engagement. Output MUST follow this exact format:
-Headline: [short, dramatic, shocking, and click-worthy — something that hooks instantly in hinglish]
-Summary: [write in a casual, funny, Gen-Z Hindi tone, like Varun Mayya's style — 4-6 lines, conversational, engaging, no emojis, for ~45 seconds spoken]
-Music: [ONLY the clean song title — do not include quotes, dashes, or artist names]
-"""
+            "content": prompt_content
         }
     ],
-    "web_access": True  # Only if supported by your endpoint
+    "web_access": True
 }
+
 headers = {
-	"x-rapidapi-key": "c66b66fd5fmsh2d1f2d4c5d0a073p17161ajsnb75f8dbbac1d",
-	"x-rapidapi-host": "chatgpt-42.p.rapidapi.com",
-	"Content-Type": "application/json"
+    "x-rapidapi-key": "c66b66fd5fmsh2d1f2d4c5d0a073p17161ajsnb75f8dbbac1d",
+    "x-rapidapi-host": "chatgpt-42.p.rapidapi.com",
+    "Content-Type": "application/json"
 }
 
 try:
     response = requests.post(url, json=payload, headers=headers)
-    response.raise_for_status()  # Raise an error for bad status codes
+    response.raise_for_status()
     response_data = response.json()
     print(response_data)
+    
+    # Get raw result
+    raw_result = response_data.get("result", "")
+    
+    # Try to find the JSON block
+    json_match = re.search(r'\{.*\}', raw_result, re.DOTALL)
+    clean_json_string = json_match.group(0) if json_match else raw_result
 
-    # Extract result string directly
-    result_string = response_data.get("result", "")
+    headline = ""
+    summary = ""
+    music = ""
 
-    # Extract headline, summary, and music using regex
-    headline_match = re.search(r"Headline:\s*(.*?)\n", result_string)
-    summary_match = re.search(r"Summary:\s*(.*?)\n", result_string, re.DOTALL)
-    music_match = re.search(r"Music:\s*(.*?)(?=\n|$)", result_string)
+    # --- PARSING LOGIC (The Fix) ---
+    try:
+        # Attempt 1: Clean JSON Parse
+        parsed_data = json.loads(clean_json_string)
+        headline = parsed_data.get("headline", "No headline")
+        summary = parsed_data.get("summary", "No summary")
+        music = parsed_data.get("music", "No music")
+        print("✅ Parsed via JSON")
 
-    # Remove any unwanted `**` or extra formatting around the result
-    headline = headline_match.group(1).strip().replace('**', '') if headline_match else "No headline found"
-    summary = summary_match.group(1).strip().replace('**', '') if summary_match else "No summary found"
-    full_music = music_match.group(1).strip().replace('*', "").replace('.', '') if music_match else "No music found"
-    music_words = full_music.split()
-    music = ' '.join(music_words[:2]) if music_words else "No music found"
+    except json.JSONDecodeError:
+        # Attempt 2: Fallback to Regex if AI forgot a comma
+        print("⚠️ JSON failed (missing comma?), switching to Regex fallback...")
+        
+        # Regex matches "key": "value" even if commas are missing between them
+        h_match = re.search(r'"headline":\s*"(.*?)"', clean_json_string, re.DOTALL)
+        s_match = re.search(r'"summary":\s*"(.*?)"', clean_json_string, re.DOTALL)
+        m_match = re.search(r'"music":\s*"(.*?)"', clean_json_string, re.DOTALL)
+        
+        headline = h_match.group(1) if h_match else "Regex Failed"
+        summary = s_match.group(1) if s_match else "Regex Failed"
+        music = m_match.group(1) if m_match else "None"
 
-
-    print("Headline:", headline)
-    print("Summary:", summary)
-    print("Music:", music)
+    # --- OUTPUT ---
+    print("\n--- Final Extracted Data ---")
+    print(f"Headline: {headline}")
+    print(f"Summary:  {summary}")
+    print(f"Music:    {music}")
 
 except requests.exceptions.RequestException as e:
-    print("Error:", e)
+    print("Network Error:", e)
 
 url = "https://rocketapi-for-developers.p.rapidapi.com/instagram/audio/search"
 
@@ -276,13 +307,9 @@ video_url = cloudinary.CloudinaryVideo("bgvideo1").video(transformation=[
       'y': -130  # Moves image 100 pixels up
       },
 
-      {"overlay": f"audio:{cloudinary_public_id}"},
-      {'effect':"volume:100"},
-      {'flags': "layer_apply"},
-      {'width': 500, 'crop': "scale"},
 
       {"overlay": f"audio:{music_public_id}", "start_offset": "45"},
-      {'effect':"volume:-90"},
+      {'effect':"volume:50"},
       {'flags': "layer_apply"},
       {'width': 500, 'crop': "scale"},
 
