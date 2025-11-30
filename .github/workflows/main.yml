@@ -20,7 +20,6 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
+
       - name: Run Python Script
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python autofeedmedia.py
