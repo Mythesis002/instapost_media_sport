@@ -1,0 +1,8 @@
+.env
+*.pickle
+token.pickle
+client_secrets.json
+__pycache__/
+*.pyc
+*.mp4
+reel.mp4
