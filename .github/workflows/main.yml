@@ -1,10 +1,10 @@
 name: Post Instagram Reel Daily
 
 on:
-  push:                 # 1. Runs immediately when you save code
+  push:                   # Runs immediately when you push code
   schedule:
-    - cron: "0 12 * * *" # 2. Runs daily at 12:00 UTC
-  workflow_dispatch:    # 3. Allows manual button click
+    - cron: "0 12 * * *"  # Runs daily at 12:00 UTC
+  workflow_dispatch:      # Allows manual trigger
 
 jobs:
   run-script:
@@ -23,6 +23,6 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Python Script
-        env:  # <--- FIXED: env is now attached to the run command
+        env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python autofeedmedia.py
