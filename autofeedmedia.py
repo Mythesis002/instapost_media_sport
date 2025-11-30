@@ -39,10 +39,7 @@ VOICE_ID = "WeK8ylKjTV2trMlayizC"
 
 # ========== GEMINI API INTEGRATION ==========
 # Get Gemini API key from environment variable
-GEMINI_API_KEY = "AIzaSyDni-suINHpO700iLH2qhi0hUcdyB-XNFI"
-if not GEMINI_API_KEY:
-    print("ERROR: Set GOOGLE_API_KEY environment variable first.")
-    exit(1)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Initialize Gemini client
 client = genai.Client(api_key=GEMINI_API_KEY)
